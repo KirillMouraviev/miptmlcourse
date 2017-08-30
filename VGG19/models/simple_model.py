@@ -1,0 +1,58 @@
+from settings  import *
+from keras.models import Sequential
+from keras.layers import Dropout, Flatten, Dense
+from keras.layers import Conv2D, MaxPooling2D, Activation
+from keras.layers.normalization import BatchNormalization
+from keras.optimizers import SGD, Adam
+
+
+def initialize_model():
+    
+    model = Sequential()
+    model.add(Conv2D(16, (4, 4), strides=(2, 2), padding='valid', input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)))
+    model.add(Activation('relu'))
+    model.add(BatchNormalization())
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(rate=0.2))
+
+    model.add(Conv2D(32, (3, 3), padding='same'))
+    model.add(Activation('relu'))
+    model.add(BatchNormalization())
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(rate=0.2))
+
+    model.add(Conv2D(64, (3, 3), padding='same'))
+    model.add(Activation('relu'))
+    model.add(BatchNormalization())
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(rate=0.2))
+    
+    model.add(Conv2D(128, (3, 3), padding='same'))
+    model.add(Activation('relu'))
+    model.add(BatchNormalization())
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(rate=0.2))
+
+    model.add(Flatten())
+    model.add(Dense(200))
+    model.add(Activation('relu'))
+    model.add(BatchNormalization())
+    model.add(Dropout(rate=0.2))
+    model.add(Dense(50))
+    model.add(Activation('relu'))
+    model.add(BatchNormalization())
+    model.add(Dense(NB_CLASSES))
+    model.add(BatchNormalization())
+    model.add(Activation('softmax'))
+
+    opt = Adam()
+    #opt = SGD()
+    model.compile(loss = "mse", optimizer = opt, metrics=['accuracy'])
+
+    print(model.summary())
+
+    model_json = model.to_json()
+    with open("model.json", "w") as json_file:
+        json_file.write(model_json)
+
+    return model
